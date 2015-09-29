@@ -2,7 +2,17 @@ class TaskController
 
   def self.add(task)
     t = task[0..-1].join(" ")
-    Task.create(task: t, complete: false)
+    task = Task.create(task: t, complete: false)
+    self.reassign!
+    TaskView.display_added_task(task)
+  end
+
+  def self.reassign!
+    i = 1
+    Task.all.each do |task|
+      task.update(id: i)
+      i += 1
+    end
   end
 
   def self.list
@@ -14,6 +24,7 @@ class TaskController
   def self.delete(id)
     task = Task.find(id)
     task.destroy
+    self.reassign!
     TaskView.display_deleted_task(task)
   end
 
@@ -21,6 +32,7 @@ class TaskController
     task = Task.find(id)
     task.complete = true
     task.save
+    TaskView.display_completed_task(task)
   end
 
 end
